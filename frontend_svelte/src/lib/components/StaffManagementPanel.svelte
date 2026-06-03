@@ -85,7 +85,7 @@
 		} catch (error) {
 			staffUsers = [];
 			setStaffMessage(
-				getApiErrorMessage(error, 'Unable to load staff accounts right now.'),
+				getApiErrorMessage(error, 'Nu s-au putut încărca conturile staff-ului momentan.'),
 				'error'
 			);
 		} finally {
@@ -95,11 +95,11 @@
 
 	function buildCreatePayload(): StaffUserCreatePayload {
 		if (!newDisplayName.trim() || !newEmail.trim() || !newPassword.trim()) {
-			throw new Error('Complete every staff account field before saving.');
+			throw new Error('Te rugăm să completezi toate câmpurile contului.');
 		}
 
 		if (newPassword.trim().length < 8) {
-			throw new Error('Passwords must be at least 8 characters long.');
+			throw new Error('Parola trebuie să aibă cel puțin 8 caractere.');
 		}
 
 		return {
@@ -118,7 +118,7 @@
 		event.preventDefault();
 
 		if (!authState.sessionToken) {
-			setStaffMessage('Your session is no longer active. Please sign in again.', 'error');
+			setStaffMessage('Sesiunea ta nu mai este activă. Te rugăm să te autentifici din nou.', 'error');
 			return;
 		}
 
@@ -132,10 +132,10 @@
 			staffUsers = nextUsers;
 			syncStaffDrafts(nextUsers);
 			resetStaffForm();
-			setStaffMessage(`Created staff account for ${createdUser.display_name}.`, 'success');
+			setStaffMessage(`Am creat contul de staff pentru ${createdUser.display_name}.`, 'success');
 		} catch (error) {
 			const fallbackMessage =
-				error instanceof Error ? error.message : 'Unable to create the staff account right now.';
+				error instanceof Error ? error.message : 'Nu s-a putut crea contul momentan.';
 			setStaffMessage(getApiErrorMessage(error, fallbackMessage), 'error');
 		} finally {
 			isCreatingStaffUser = false;
@@ -144,7 +144,7 @@
 
 	async function handleSaveStaffUser(user: User): Promise<void> {
 		if (!authState.sessionToken) {
-			setStaffMessage('Your session is no longer active. Please sign in again.', 'error');
+			setStaffMessage('Sesiunea ta nu mai este activă. Te rugăm să te autentifici din nou.', 'error');
 			return;
 		}
 
@@ -154,18 +154,18 @@
 		}
 
 		if (!draft.display_name.trim()) {
-			setStaffMessage('Display names cannot be blank.', 'error');
+			setStaffMessage('Numele afișat nu poate fi gol.', 'error');
 			return;
 		}
 
 		if (isCurrentSignedInAdmin(user)) {
 			if (!draft.is_active) {
-				setStaffMessage('The signed-in admin account must remain active.', 'error');
+				setStaffMessage('Contul de admin autentificat trebuie să rămână activ.', 'error');
 				return;
 			}
 
 			if (draft.role !== 'admin') {
-				setStaffMessage('The signed-in admin account must keep admin access.', 'error');
+				setStaffMessage('Contul de admin autentificat trebuie să păstreze accesul de admin.', 'error');
 				return;
 			}
 		}
@@ -192,10 +192,10 @@
 				authState.currentUser = updatedUser;
 			}
 
-			setStaffMessage(`Updated ${updatedUser.display_name}.`, 'success');
+			setStaffMessage(`Am actualizat contul lui ${updatedUser.display_name}.`, 'success');
 		} catch (error) {
 			setStaffMessage(
-				getApiErrorMessage(error, 'Unable to update the staff account right now.'),
+				getApiErrorMessage(error, 'Nu s-a putut actualiza contul momentan.'),
 				'error'
 			);
 		} finally {
@@ -208,15 +208,15 @@
 	<section class="staff-panel">
 		<div class="panel-header">
 			<div>
-				<p class="eyebrow">Accounts</p>
-				<h2>Create a staff account</h2>
+				<p class="eyebrow">Conturi</p>
+				<h2>Creează un cont de staff</h2>
 			</div>
-			<p class="panel-count">{staffUsers.length} staff users</p>
+			<p class="panel-count">{staffUsers.length} utilizatori staff</p>
 		</div>
 
 		<form class="staff-form" onsubmit={handleCreateStaffUser}>
 			<label>
-				<span>Display name</span>
+				<span>Nume afișat</span>
 				<input bind:value={newDisplayName} type="text" required />
 			</label>
 
@@ -226,12 +226,12 @@
 			</label>
 
 			<label>
-				<span>Password</span>
+				<span>Parolă</span>
 				<input bind:value={newPassword} type="password" minlength="8" required />
 			</label>
 
 			<label>
-				<span>Role</span>
+				<span>Rol</span>
 				<select bind:value={newRole}>
 					<option value="manager">Manager</option>
 					<option value="admin">Admin</option>
@@ -240,7 +240,7 @@
 
 			<div class="form-actions form-span-2">
 				<button type="submit" disabled={isCreatingStaffUser}>
-					{isCreatingStaffUser ? 'Creating account...' : 'Create staff account'}
+					{isCreatingStaffUser ? 'Se creează...' : 'Creează cont staff'}
 				</button>
 				<button
 					class="secondary"
@@ -248,7 +248,7 @@
 					onclick={resetStaffForm}
 					disabled={isCreatingStaffUser}
 				>
-					Reset
+					Resetează
 				</button>
 			</div>
 		</form>
@@ -257,10 +257,10 @@
 	<section class="staff-panel">
 		<div class="panel-header">
 			<div>
-				<p class="eyebrow">Roster</p>
-				<h2>Manage staff access</h2>
+				<p class="eyebrow">Echipă</p>
+				<h2>Gestionează accesul staff-ului</h2>
 			</div>
-			<p class="panel-note">Update names, roles, and account status.</p>
+			<p class="panel-note">Actualizează numele, rolurile și statusul conturilor.</p>
 		</div>
 
 		{#if staffMessage}
@@ -268,9 +268,9 @@
 		{/if}
 
 		{#if isLoadingStaffUsers}
-			<p class="loading-copy">Loading staff accounts...</p>
+			<p class="loading-copy">Se încarcă conturile...</p>
 		{:else if staffUsers.length === 0}
-			<p class="empty-state">No staff accounts are available yet.</p>
+			<p class="empty-state">Nu există încă conturi de staff disponibile.</p>
 		{:else}
 			<div class="staff-list">
 				{#each staffUsers as user (user.id)}
@@ -284,7 +284,7 @@
 								<span
 									class={`badge ${(staffDrafts[user.id]?.is_active ?? user.is_active) ? 'active-badge' : 'inactive-badge'}`}
 								>
-									{(staffDrafts[user.id]?.is_active ?? user.is_active) ? 'Active' : 'Inactive'}
+									{(staffDrafts[user.id]?.is_active ?? user.is_active) ? 'Activ' : 'Inactiv'}
 								</span>
 								<span class="badge role-badge">{staffDrafts[user.id]?.role ?? user.role}</span>
 							</div>
@@ -292,7 +292,7 @@
 
 						<div class="staff-controls">
 							<label>
-								<span>Display name</span>
+								<span>Nume afișat</span>
 								<input
 									value={staffDrafts[user.id]?.display_name ?? user.display_name}
 									oninput={(event) =>
@@ -303,7 +303,7 @@
 							</label>
 
 							<label>
-								<span>Role</span>
+								<span>Rol</span>
 								<select
 									value={staffDrafts[user.id]?.role ?? user.role}
 									onchange={(event) =>
@@ -327,7 +327,7 @@
 										})}
 									disabled={isCurrentSignedInAdmin(user)}
 								/>
-								<span>Account active</span>
+								<span>Cont activ</span>
 							</label>
 						</div>
 
@@ -337,12 +337,12 @@
 								onclick={() => handleSaveStaffUser(user)}
 								disabled={updatingStaffUserId === user.id}
 							>
-								{updatingStaffUserId === user.id ? 'Saving...' : 'Save changes'}
+								{updatingStaffUserId === user.id ? 'Se salvează...' : 'Salvează modificările'}
 							</button>
 
 							{#if isCurrentSignedInAdmin(user)}
 								<p class="inline-note">
-									The signed-in admin account must stay active and keep admin access.
+									Contul de admin autentificat trebuie să rămână activ și să păstreze accesul de admin.
 								</p>
 							{/if}
 						</div>

@@ -128,7 +128,7 @@ def revoke_user_session(session: Session, user_session: UserSession) -> None:
 
 
 def get_session_token(
-    x_session_token: Annotated[str | None, Header(alias=SESSION_HEADER_NAME)] = None,
+    x_session_token: Annotated[str | None, Header()] = None,
 ) -> str:
     if x_session_token is None:
         raise HTTPException(

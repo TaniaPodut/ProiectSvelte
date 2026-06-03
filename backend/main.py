@@ -19,7 +19,6 @@ from . import auth, database
 from .models import (
     Comanda,
     ComandaCreare,
-    DateAutentificare,
     LoginRequest,
     MesajContact,
     Produs,
@@ -85,6 +84,15 @@ app = FastAPI(
     lifespan=durata_de_viata,
 )
 
+import traceback
+import sys
+
+@app.exception_handler(Exception)
+async def debug_exception_handler(request, exc):
+    print(f"ERROR: {exc}", file=sys.stderr)
+    traceback.print_exc()
+    return HTTPException(status_code=500, detail=str(exc))
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -130,6 +138,14 @@ def trimite_mesaj_contact(mesaj: MesajContact, sesiune: Session = Depends(databa
     sesiune.add(mesaj)
     sesiune.commit()
     return {"status": "success"}
+
+
+@app.get("/api/contact", response_model=list[MesajContact])
+def obtine_mesaje_contact(
+    current_user: Annotated[User, Depends(auth.require_manager_or_admin)],
+    sesiune: Session = Depends(database.obtine_sesiune)
+):
+    return list(sesiune.exec(select(MesajContact).order_by(MesajContact.id.desc())).all())
 
 
 # --- Auth API ---

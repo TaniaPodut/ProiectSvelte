@@ -25,25 +25,26 @@
 		errorMessage = '';
 
 		try {
-			const user = await authState.login({ email, password });
-			await goto(getDashboardPath(user.role));
+			await authState.login({ email, password });
+            if (authState.currentUser) {
+			    await goto(getDashboardPath(authState.currentUser.role));
+            }
 		} catch (error) {
-			errorMessage = getApiErrorMessage(error, 'Unable to sign in right now.');
+			errorMessage = getApiErrorMessage(error, 'Nu te-ai putut autentifica momentan.');
 		}
 	}
 </script>
 
 <svelte:head>
-	<title>Staff Login</title>
+	<title>Autentificare Staff - Webtania</title>
 </svelte:head>
 
 <section class="login-shell">
 	<div class="login-card">
-		<p class="eyebrow">Staff Access</p>
-		<h1>Sign in to the operations dashboard</h1>
+		<p class="eyebrow">Acces Staff</p>
+		<h1>Autentifică-te în panoul operațional</h1>
 		<p class="intro">
-			Managers can review reservations. Admins can manage reservations, menu items, and staff
-			accounts.
+			Managerii pot vizualiza comenzile și mesajele. Adminii pot gestiona catalogul de produse, comenzile și echipa.
 		</p>
 
 		<form class="login-form" onsubmit={handleSubmit}>
@@ -53,7 +54,7 @@
 			</label>
 
 			<label>
-				<span>Password</span>
+				<span>Parolă</span>
 				<input
 					bind:value={password}
 					type="password"
@@ -68,11 +69,11 @@
 			{/if}
 
 			<button type="submit" disabled={authState.isLoading}>
-				{authState.isLoading ? 'Signing in...' : 'Sign in'}
+				{authState.isLoading ? 'Se autentifică...' : 'Autentificare'}
 			</button>
 		</form>
 
-		<a class="back-link" href="/">Back to the public site</a>
+		<a class="back-link" href="/">Înapoi la site-ul public</a>
 	</div>
 </section>
 

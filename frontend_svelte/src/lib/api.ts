@@ -122,6 +122,10 @@ export function getOrders(sessionToken: string) {
 	return apiRequest<Order[]>('/orders', { sessionToken });
 }
 
+export function getContactMessages(sessionToken: string) {
+	return apiRequest<ContactPayload[]>('/contact', { sessionToken });
+}
+
 export function uploadImage(file: File, sessionToken: string) {
 	const formData = new FormData();
 	formData.append('fisier', file);

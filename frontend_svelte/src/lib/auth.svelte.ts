@@ -8,6 +8,7 @@ class AuthState {
 	sessionToken = $state<string | null>(null);
 	currentUser = $state<User | null>(null);
 	isHydrated = $state(false);
+	isLoading = $state(false);
 
 	async hydrate() {
 		if (!browser || this.isHydrated) return;
@@ -24,12 +25,18 @@ class AuthState {
 		this.isHydrated = true;
 	}
 
-	async login(payload: LoginRequestPayload) {
-		const response = await loginStaff(payload);
-		this.sessionToken = response.session_token;
-		this.currentUser = response.user;
-		if (browser) {
-			localStorage.setItem(SESSION_STORAGE_KEY, response.session_token);
+	async login(payload: LoginRequestPayload): Promise<User> {
+		this.isLoading = true;
+		try {
+			const response = await loginStaff(payload);
+			this.sessionToken = response.session_token;
+			this.currentUser = response.user;
+			if (browser) {
+				localStorage.setItem(SESSION_STORAGE_KEY, response.session_token);
+			}
+			return response.user;
+		} finally {
+			this.isLoading = false;
 		}
 	}
 

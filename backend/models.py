@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, date as DateValue, datetime, time as TimeValue
+from datetime import datetime, timezone, date as DateValue, time as TimeValue
 from enum import Enum
 
 from pydantic import EmailStr, field_validator
@@ -8,7 +8,7 @@ from sqlmodel import Field, SQLModel
 
 
 def utc_now() -> datetime:
-    return datetime.now(UTC).replace(tzinfo=None)
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class UserRole(str, Enum):
