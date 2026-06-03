@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "name": "Relaxatul (The Laid Back)",
+        "category": "Relaxare",
+        "price": 499.0,
+        "description": "Timp liber și relaxare. Confortabil timp de 4 ore. Piele vegană. Cântărește 16 kg.",
+        "image": "chair-1.jpg",
+        "alt": "Scaun de relaxare Relaxatul",
+        "isFeatured": true
+    },
+    {
+        "id": 2,
+        "name": "Albina Lucrătoare (The Worker Bee)",
+        "category": "Birou",
+        "price": 799.0,
+        "description": "Ideal pentru muncă. Confortabil timp de 8 ore. Piele vegană. Cântărește 22 kg.",
+        "image": "chair-2.jpg",
+        "alt": "Scaun de birou Albina Lucrătoare",
+        "isFeatured": true
+    },
+    {
+        "id": 3,
+        "name": "Scaunul 4/2 (The Chair 4/2)",
+        "category": "Premium",
+        "price": 2999.0,
+        "description": "Timp liber și relaxare. Confortabil toată ziua! Bumbac organic. Cântărește 80 kg.",
+        "image": "chair-3.jpg",
+        "alt": "Scaun premium Scaunul 4/2",
+        "isFeatured": true
+    }
+]

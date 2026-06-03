@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Podut Tania" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="admin.css" />
+    <title>Webtania &mdash; Admin</title>
+  </head>
+  <body>
+
+    <!-- ===== ECRAN LOGIN ===== -->
+    <div class="ecran-login" id="ecran-login">
+      <div class="login-card">
+        <h1 class="login-titlu">Panou Admin</h1>
+        <p class="login-subtitlu">Autentifică-te pentru a gestiona produsele</p>
+
+        <form id="formular-login">
+          <div class="camp">
+            <label for="username">Utilizator</label>
+            <input id="username" type="text" name="username" placeholder="admin" required autofocus />
+          </div>
+          <div class="camp">
+            <label for="password">Parolă</label>
+            <input id="password" type="password" name="password" placeholder="••••••••" required />
+          </div>
+          <button type="submit" class="btn-login">Autentifică-te</button>
+          <p id="eroare-login" class="eroare-login" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- ===== PANOU ADMIN ===== -->
+    <div class="panou-admin ascuns" id="panou-admin">
+
+      <header class="admin-antet">
+        <div class="admin-antet-continut">
+          <span class="admin-titlu">Magazin de Scaune &mdash; Panou Admin</span>
+        </div>
+        <div class="admin-antet-actiuni">
+          <a href="/" class="btn-secundar">← Site principal</a>
+          <button id="btn-logout" class="btn-logout">Deconectare</button>
+        </div>
+      </header>
+
+      <main class="admin-main">
+
+        <!-- Adaugă produs -->
+        <section class="sectiune-card">
+          <h2 class="sectiune-titlu">Adaugă Produs Nou</h2>
+
+          <form id="formular-adauga">
+            <div class="grila-form">
+              <div class="camp">
+                <label for="name">Nume produs</label>
+                <input id="name" type="text" name="name" placeholder="Scaun ergonomic" required />
+              </div>
+
+              <div class="camp">
+                <label for="category">Categorie</label>
+                <select id="category" name="category" required>
+                  <option value="">Alege categoria:</option>
+                  <option value="Relaxare">Relaxare</option>
+                  <option value="Birou">Birou</option>
+                  <option value="Premium">Premium</option>
+                </select>
+              </div>
+
+              <div class="camp">
+                <label for="price">Preț (lei)</label>
+                <input id="price" type="number" name="price" step="0.01" min="0" placeholder="499.00" required />
+              </div>
+
+              <div class="camp camp--larg">
+                <label for="description">Descriere</label>
+                <textarea id="description" name="description" rows="4" placeholder="Descriere detaliată a produsului..." required></textarea>
+              </div>
+
+              <div class="camp camp--larg">
+                <label for="image-file">Imagine produs</label>
+                <div class="upload-zona">
+                  <input id="image-file" type="file" name="image-file" accept="image/*" class="input-fisier" />
+                  <input id="image" type="hidden" name="image" />
+                  <img id="previzualizare-imagine" class="previzualizare-imagine ascuns" alt="Previzualizare imagine" />
+                </div>
+              </div>
+
+              <div class="camp camp--larg">
+                <label for="alt">Text alternativ imagine</label>
+                <input id="alt" type="text" name="alt" placeholder="Descriere imagine pentru accesibilitate" required />
+              </div>
+
+              <div class="camp camp--checkbox">
+                <input id="isFeatured" type="checkbox" name="isFeatured" />
+                <label for="isFeatured">Afișează în secțiunea principală (Featured)</label>
+              </div>
+            </div>
+
+            <button type="submit" class="btn-primar">Adaugă Produs</button>
+            <p id="mesaj-adauga" class="mesaj" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <!-- Tabel produse existente -->
+        <section class="sectiune-card">
+          <div class="tabel-antet">
+            <h2 class="sectiune-titlu">Produse Existente</h2>
+            <button id="btn-reincarca" class="btn-secundar">↻ Reîncarcă</button>
+          </div>
+
+          <div class="tabel-container">
+            <table class="tabel-produse" id="tabel-produse">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Imagine</th>
+                  <th>Nume</th>
+                  <th>Categorie</th>
+                  <th>Preț</th>
+                  <th>Featured</th>
+                  <th>Acțiuni</th>
+                </tr>
+              </thead>
+              <tbody id="corp-tabel">
+                <tr>
+                  <td colspan="7" class="tabel-stare">Se încarcă...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p id="mesaj-stergere" class="mesaj" aria-live="polite"></p>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- ===== MODAL EDIT ===== -->
+    <div class="modal-overlay ascuns" id="modal-overlay">
+      <div class="modal-card">
+        <div class="modal-antet">
+          <h3 class="modal-titlu">Editează Produs</h3>
+          <button class="modal-inchide" id="modal-inchide">&times;</button>
+        </div>
+
+        <form id="formular-edit">
+          <input type="hidden" name="id" id="edit-id" />
+
+          <div class="grila-form">
+            <div class="camp">
+              <label for="edit-name">Nume produs</label>
+              <input id="edit-name" type="text" name="name" required />
+            </div>
+            <div class="camp">
+              <label for="edit-category">Categorie</label>
+              <select id="edit-category" name="category" required>
+                <option value="Relaxare">Relaxare</option>
+                <option value="Birou">Birou</option>
+                <option value="Premium">Premium</option>
+              </select>
+            </div>
+            <div class="camp">
+              <label for="edit-price">Preț (lei)</label>
+              <input id="edit-price" type="number" name="price" step="0.01" min="0" required />
+            </div>
+            <div class="camp camp--larg">
+              <label for="edit-description">Descriere</label>
+              <textarea id="edit-description" name="description" rows="4" required></textarea>
+            </div>
+            <div class="camp camp--larg">
+              <label for="edit-image-file">Imagine produs</label>
+              <div class="upload-zona">
+                <input id="edit-image-file" type="file" name="image-file" accept="image/*" class="input-fisier" />
+                <input id="edit-image" type="hidden" name="image" />
+                <img id="edit-previzualizare-imagine" class="previzualizare-imagine" alt="Previzualizare imagine" />
+              </div>
+            </div>
+            <div class="camp camp--larg">
+              <label for="edit-alt">Text alternativ imagine</label>
+              <input id="edit-alt" type="text" name="alt" required />
+            </div>
+            <div class="camp camp--checkbox">
+              <input id="edit-isFeatured" type="checkbox" name="isFeatured" />
+              <label for="edit-isFeatured">Featured (apare pe homepage)</label>
+            </div>
+          </div>
+
+          <div class="modal-actiuni">
+            <button type="button" class="btn-secundar" id="modal-anuleaza">Anulează</button>
+            <button type="submit" class="btn-primar btn-primar--mic">Salvează modificările</button>
+          </div>
+          <p id="mesaj-edit" class="mesaj" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <script src="admin.js"></script>
+  </body>
+</html>

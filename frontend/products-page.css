@@ -1,0 +1,264 @@
+/* ======================== */
+/* ANTET PAGINI SECUNDARE  */
+/* ======================== */
+
+.antet-pagina {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+  margin-bottom: 48px;
+}
+
+.link-logo {
+  font-size: 18px;
+  font-weight: 700;
+  color: #087f5b;
+  text-decoration: none;
+}
+
+.link-logo:hover {
+  color: #099268;
+}
+
+nav {
+  display: flex;
+  gap: 24px;
+}
+
+.nav-link:link,
+.nav-link:visited {
+  font-size: 16px;
+  font-weight: 500;
+  color: #343a40;
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.nav-link:hover,
+.nav-link:active {
+  color: #087f5b;
+  border-bottom-color: #087f5b;
+}
+
+.nav-link--activ:link,
+.nav-link--activ:visited {
+  color: #087f5b;
+  border-bottom-color: #087f5b;
+}
+
+/* ======================== */
+/* FILTRE                   */
+/* ======================== */
+
+.filtre {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+}
+
+.btn-filtru {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 20px;
+  border: 2px solid #087f5b;
+  border-radius: 100px;
+  background-color: #fff;
+  color: #087f5b;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.btn-filtru:hover,
+.btn-filtru.activ {
+  background-color: #087f5b;
+  color: #fff;
+}
+
+/* ======================== */
+/* SECTIUNEA PRODUSE        */
+/* ======================== */
+
+.sectiune-produse {
+  margin-bottom: 96px;
+}
+
+.sectiune-produse h2 {
+  margin-bottom: 32px;
+}
+
+/* ======================== */
+/* CARD PRODUS (GRID)       */
+/* ======================== */
+
+.produs-link:link,
+.produs-link:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-produs {
+  box-shadow: 0 20px 30px 0 rgba(0, 0, 0, 0.07);
+  border-radius: 12px;
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card-produs:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 40px 0 rgba(0, 0, 0, 0.12);
+}
+
+.card-produs img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+.card-produs-continut {
+  padding: 24px;
+}
+
+.card-produs-eticheta {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 12px;
+  background-color: #e6fcf5;
+  color: #087f5b;
+}
+
+.card-produs-titlu {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.card-produs-descriere {
+  font-size: 14px;
+  color: #868e96;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.card-produs-pret {
+  font-size: 20px;
+  font-weight: 700;
+  color: #087f5b;
+}
+
+/* ======================== */
+/* STARE INCARCARE          */
+/* ======================== */
+
+.stare-incarcare {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 18px;
+  color: #868e96;
+  padding: 48px 0;
+}
+
+/* ======================== */
+/* PAGINA DETALIU PRODUS    */
+/* ======================== */
+
+.detaliu-inapoi:link,
+.detaliu-inapoi:visited {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 500;
+  color: #087f5b;
+  text-decoration: none;
+  margin-bottom: 32px;
+  transition: color 0.2s;
+}
+
+.detaliu-inapoi:hover {
+  color: #099268;
+}
+
+.detaliu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: start;
+  margin-bottom: 64px;
+}
+
+.detaliu-img-container img {
+  width: 100%;
+  border-radius: 12px;
+}
+
+.detaliu-eticheta {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 4px 12px;
+  border-radius: 100px;
+  margin-bottom: 16px;
+  background-color: #e6fcf5;
+  color: #087f5b;
+}
+
+.detaliu-featured {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f08c00;
+  margin-left: 8px;
+}
+
+.detaliu-titlu {
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.detaliu-descriere {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #495057;
+  margin-bottom: 24px;
+  white-space: pre-line;
+}
+
+.detaliu-pret {
+  font-size: 32px;
+  font-weight: 700;
+  color: #087f5b;
+  margin-bottom: 32px;
+}
+
+.detaliu-btn:link,
+.detaliu-btn:visited {
+  display: inline-block;
+  background-color: #087f5b;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 16px 32px;
+  border-radius: 100px;
+  transition: background-color 0.2s;
+}
+
+.detaliu-btn:hover,
+.detaliu-btn:active {
+  background-color: #099268;
+}

@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.db
+frontend/node_modules/
+frontend/.svelte-kit/
+frontend/build/
+frontend_legacy/
+.idea/

@@ -1,0 +1,265 @@
+/* admin.css scoped for Svelte component or just imported */
+.ecran-login {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e6fcf5, #c3fae8);
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+}
+
+.login-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 48px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-titlu {
+  font-size: 28px;
+  font-weight: 700;
+  color: #064e3b;
+  margin-bottom: 8px;
+}
+
+.login-subtitlu {
+  font-size: 15px;
+  color: #888;
+  margin-bottom: 32px;
+}
+
+.login-password {
+  margin-top: 16px;
+}
+
+.login-submit {
+  margin-top: 24px;
+  width: 100%;
+}
+
+.eroare-login {
+  color: #dc2626;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+.panou-admin {
+  background-color: #f3f4f6;
+  min-height: 100vh;
+}
+
+.admin-antet {
+  background: #064e3b;
+  padding: 16px 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #fff;
+}
+
+.admin-titlu { font-size: 20px; font-weight: 700; }
+
+.admin-actiuni {
+  display: flex;
+  gap: 12px;
+}
+
+.admin-link-site {
+  text-decoration: none;
+}
+
+.admin-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.sectiune-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.sectiune-titlu {
+  font-size: 20px;
+  font-weight: 600;
+  color: #064e3b;
+  margin-bottom: 24px;
+}
+
+.admin-sectiune-antet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.admin-sectiune-titlu {
+  margin: 0;
+}
+
+.btn-reincarca {
+  padding: 8px 16px;
+}
+
+.grila-form {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.camp {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.camp--larg { grid-column: 1 / -1; }
+
+.camp--checkbox {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.camp label { font-size: 14px; font-weight: 500; color: #333; text-align: left; }
+
+.camp input,
+.camp select,
+.camp textarea {
+  font-family: inherit;
+  font-size: 15px;
+  padding: 10px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+}
+
+.tabel-container { overflow-x: auto; }
+
+.tabel-produse {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.tabel-produse th {
+  text-align: left;
+  padding: 12px 16px;
+  background: #e6fcf5;
+  color: #064e3b;
+  font-weight: 600;
+  border-bottom: 2px solid #c3fae8;
+}
+
+.tabel-produse td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.tabel-img {
+  width: 56px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.btn-primar {
+  background: #087f5b;
+  color: #fff;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-logout {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.5);
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-sterge {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-edit {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 720px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-card .sectiune-card {
+  box-shadow: none;
+  padding: 0;
+}
+
+.modal-actiuni {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.btn-anuleaza {
+  color: #333;
+  border-color: #ccc;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge--da { background: #dcfce7; color: #16a34a; }
+.badge--nu { background: #f3f4f6; color: #9ca3af; }
+
+.mesaj { margin-top: 12px; font-size: 14px; }
+.mesaj--succes { color: #16a34a; }
+.mesaj--eroare { color: #dc2626; }

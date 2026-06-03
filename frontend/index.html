@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="ro">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Podut Tania" />
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="style.css" />
+    <title>Magazin de Scaune Baia Mare</title>
+  </head>
+  <body>
+    <div class="container">
+      <header class="antet-pagina">
+        <a href="/" class="link-logo">Magazin de Scaune Baia Mare</a>
+        <nav>
+          <a href="/" class="nav-link nav-link--activ">Acasă</a>
+          <a href="/products" class="nav-link">Produse</a>
+          <a href="/contact" class="nav-link">Contact</a>
+          <a href="/admin" class="nav-link">Admin</a>
+        </nav>
+      </header>
+
+      <header class="sectiune-hero">
+        <div class="caseta-text-antet">
+          <h1>Proiectăm și construim scaune mai bune, pentru o viață mai bună</h1>
+          <p class="text-antet">
+            Într-un mic magazin din inima orașului Baia Mare, ne petrecem zilele
+            perfecționând neîncetat scaunul. Rezultatul este un amestec perfect de
+            frumusețe și confort, care va avea un impact de durată asupra sănătății dumneavoastră.
+          </p>
+          <a class="buton buton--mare" href="/products">Cumpără scaune</a>
+        </div>
+        <img src="hero.jpg" alt="Fotografie scaun" />
+      </header>
+
+      <section>
+        <h2>Ce face scaunele noastre speciale</h2>
+        <div class="grila-3-coloane">
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="pictograma-caracteristici"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+              />
+            </svg>
+            <p class="titlu-caracteristici"><strong>Știința întâlnește designul</strong></p>
+            <p class="text-caracteristici">
+              Folosim principii de ergonomie avansată pentru a crea scaune care susțin postura corectă a corpului tău pe tot parcursul zilei.
+            </p>
+          </div>
+
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="pictograma-caracteristici"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <p class="titlu-caracteristici">
+              <strong>Confort maxim</strong>
+            </p>
+            <p class="text-caracteristici">
+              Materialele premium și designul inovator garantează o experiență de relaxare de neegalat, indiferent de durata utilizării.
+            </p>
+          </div>
+
+          <div>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="pictograma-caracteristici"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+              />
+            </svg>
+            <p class="titlu-caracteristici">
+              <strong>Etic și sustenabil</strong>
+            </p>
+            <p class="text-caracteristici">
+              Suntem dedicați protejării mediului, folosind doar materiale ecologice și procese de producție responsabile în atelierul nostru.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="sectiune-marturii">
+        <div class="grila-3-coloane">
+          <img src="customers.jpg" alt="Oameni stând pe scaune" />
+          <div class="caseta-marturii">
+            <h2>"Nu am mai putea trăi fără aceste scaune"</h2>
+            <blockquote class="text-marturii">
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor
+              repellat at, nesciunt quia cum minima ipsum culpa totam sapiente
+              recusandae earum debitis doloribus in quasi voluptatibus!
+            </blockquote>
+            <p class="autor-marturii">&mdash; Mary și Sarah Johnson</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Cele mai vândute scaune</h2>
+        <div class="grila-3-coloane" id="grila-scaune" style="margin-bottom: 48px;">
+          <figure class="scaun">
+            <a href="/product?id=1"><img src="chair-1.jpg" alt="Scaun" /></a>
+            <div class="caseta-scaun">
+              <h3>Relaxatul (The Laid Back)</h3>
+              <ul class="detalii-scaun">
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
+                  </svg>
+                  <!-- Span este un element text generic de tip INLINE, nu are nicio semnificație specială. Este ca un div, dar pe linie -->
+                  <span>Timp liber și relaxare</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Confortabil timp de 4 ore</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Piele vegană</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                  <span>Cântărește 16 kg</span>
+                </li>
+              </ul>
+              <div class="pret-scaun">
+                <strong>499 lei</strong>
+                <a href="/product?id=1" class="buton buton--mic">Vezi detalii</a>
+              </div>
+            </div>
+          </figure>
+
+          <figure class="scaun">
+            <a href="/product?id=2"><img src="chair-2.jpg" alt="Scaun" /></a>
+            <div class="caseta-scaun">
+              <h3>Albina Lucrătoare (The Worker Bee)</h3>
+              <ul class="detalii-scaun">
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
+                  </svg>
+                  <span>Muncă</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Confortabil timp de 8 ore</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Piele vegană</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                  <span>Cântărește 22 kg</span>
+                </li>
+              </ul>
+              <div class="pret-scaun">
+                <strong>799 lei</strong>
+                <a href="/product?id=2" class="buton buton--mic">Vezi detalii</a>
+              </div>
+            </div>
+          </figure>
+
+          <figure class="scaun">
+            <a href="/product?id=3"><img src="chair-3.jpg" alt="Scaun" /></a>
+            <div class="caseta-scaun">
+              <h3>Scaunul 4/2 (The Chair 4/2)</h3>
+              <ul class="detalii-scaun">
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                    />
+                  </svg>
+                  <span>Timp liber și relaxare</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Confortabil toată ziua!</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  <span>Bumbac organic</span>
+                </li>
+                <li>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="pictograma-scaun"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
+                  </svg>
+                  <span>Cântărește 80 kg</span>
+                </li>
+              </ul>
+              <div class="pret-scaun">
+                <strong>2.999 lei</strong>
+                <a href="/product?id=3" class="buton buton--mic">Vezi detalii</a>
+              </div>
+            </div>
+          </figure>
+        </div>
+        <div style="text-align: center;">
+          <a href="/products" class="buton buton--mare">Vezi toate produsele &rarr;</a>
+        </div>
+      </section>
+
+      <footer>
+        Drepturi de autor &copy; 2027 de către Podut Tania. Toate drepturile rezervate.
+      </footer>
+    </div>
+
+    <script>
+      async function incarcaScaune() {
+        const grila = document.querySelector("#grila-scaune");
+        try {
+          const raspuns = await fetch("/api/products");
+          const produse = await raspuns.json();
+
+          grila.innerHTML = produse.slice(0, 3).map(p => `
+            <figure class="scaun">
+              <a href="/product?id=${p.id}"><img src="${p.image}" alt="${p.alt}" /></a>
+              <div class="caseta-scaun">
+                <h3>${p.name}</h3>
+                <p class="scaun-descriere">${p.description}</p>
+                <div class="pret-scaun">
+                  <strong>${p.price.toFixed(2)} lei</strong>
+                  <a href="/product?id=${p.id}" class="buton buton--mic">Vezi detalii</a>
+                </div>
+              </div>
+            </figure>
+          `).join("");
+        } catch {
+          /* Dacă serverul nu rulează, grila rămâne cu conținutul static */
+        }
+      }
+
+      incarcaScaune();
+    </script>
+  </body>
+</html>
