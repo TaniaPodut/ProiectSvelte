@@ -1,129 +1,171 @@
-import type { AdminCredentials, ContactPayload, Order, OrderPayload, Product, ProductFormData } from '$lib/types';
+import { apiBasePath, sessionHeaderName } from '$lib/config';
+import type {
+	Product,
+	ProductFormData,
+	Order,
+	OrderPayload,
+	ContactPayload,
+	AdminCredentials,
+    User,
+    SessionResponse,
+    LoginRequestPayload,
+    StaffUserCreatePayload,
+    StaffUserUpdatePayload
+} from '$lib/types';
 
-async function parseJson<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    let message = 'Cererea nu a reușit.';
+type ApiRequestOptions = RequestInit & {
+	sessionToken?: string;
+};
 
-    try {
-      const error = await response.json();
-      message = error.detail || error.message || message;
-    } catch {
-      // Response has no JSON body.
-    }
+export class ApiError extends Error {
+	status: number;
+	detail?: any;
 
-    throw new Error(message);
-  }
-
-  return response.json() as Promise<T>;
+	constructor(status: number, detail?: any) {
+		super(typeof detail === 'string' ? detail : 'API request failed.');
+		this.name = 'ApiError';
+		this.status = status;
+		this.detail = detail;
+	}
 }
 
-function adminHeaders(token: string) {
-  return {
-    Authorization: `Bearer ${token}`
-  };
+async function readResponseData(response: Response): Promise<unknown> {
+	const contentType = response.headers.get('content-type') ?? '';
+	if (!contentType.includes('application/json')) {
+		return null;
+	}
+	return await response.json();
 }
 
-export async function getProducts() {
-  return parseJson<Product[]>(await fetch('/api/products'));
+function buildHeaders(headersInit: HeadersInit | undefined, sessionToken?: string): Headers {
+	const headers = new Headers(headersInit);
+	if (sessionToken) {
+		headers.set(sessionHeaderName, sessionToken);
+	}
+	return headers;
 }
 
-export async function getProduct(id: string | number) {
-  return parseJson<Product>(await fetch(`/api/products/${id}`));
+export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
+	const { sessionToken, headers: headersInit, ...requestInit } = options;
+	const response = await fetch(`${apiBasePath}${path}`, {
+		...requestInit,
+		headers: buildHeaders(headersInit, sessionToken)
+	});
+	const data = await readResponseData(response);
+
+	if (!response.ok) {
+		const detail = (data as any)?.detail || 'A apărut o eroare.';
+		throw new ApiError(response.status, detail);
+	}
+
+	return data as T;
 }
 
-export async function sendContactMessage(payload: ContactPayload) {
-  return parseJson<{ status: string; message: string }>(
-    await fetch('/api/contact', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-  );
+export function getApiErrorMessage(error: unknown, fallbackMessage: string): string {
+	if (error instanceof ApiError) {
+		if (typeof error.detail === 'string') return error.detail;
+		if (Array.isArray(error.detail)) return error.detail.map((d: any) => d.msg).join(' ');
+	}
+	return fallbackMessage;
 }
 
-export async function createOrder(payload: OrderPayload) {
-  return parseJson<Order>(
-    await fetch('/api/orders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    })
-  );
+// --- Public API ---
+
+export function getProducts() {
+	return apiRequest<Product[]>('/products');
 }
 
-export async function loginAdmin(credentials: AdminCredentials) {
-  return parseJson<{ token: string }>(
-    await fetch('/api/admin/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    })
-  );
+export function getProduct(id: string | number) {
+	return apiRequest<Product>(`/products/${id}`);
 }
 
-export async function logoutAdmin(token: string) {
-  return parseJson<{ mesaj: string }>(
-    await fetch('/api/admin/logout', {
-      method: 'POST',
-      headers: adminHeaders(token)
-    })
-  );
+export function sendContactMessage(payload: ContactPayload) {
+	return apiRequest<{ status: string }>('/contact', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload)
+	});
 }
 
-export async function getOrders(token: string) {
-  return parseJson<Order[]>(
-    await fetch('/api/orders', {
-      headers: adminHeaders(token)
-    })
-  );
+export function createOrder(payload: OrderPayload) {
+	return apiRequest<Order>('/orders', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload)
+	});
 }
 
-export async function uploadImage(file: File, token: string) {
-  const formData = new FormData();
-  formData.append('fisier', file);
+// --- Auth API ---
 
-  return parseJson<{ filename: string }>(
-    await fetch('/api/upload', {
-      method: 'POST',
-      headers: adminHeaders(token),
-      body: formData
-    })
-  );
+export function loginStaff(payload: LoginRequestPayload): Promise<SessionResponse> {
+	return apiRequest<SessionResponse>('/auth/login', {
+		method: 'POST',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload)
+	});
 }
 
-export async function createProduct(product: ProductFormData, token: string) {
-  return parseJson<Product>(
-    await fetch('/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...adminHeaders(token)
-      },
-      body: JSON.stringify(product)
-    })
-  );
+export async function logoutStaff(sessionToken: string): Promise<void> {
+	await apiRequest('/auth/logout', {
+		method: 'POST',
+		sessionToken
+	});
 }
 
-export async function updateProduct(id: number, product: ProductFormData, token: string) {
-  return parseJson<Product>(
-    await fetch(`/api/products/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        ...adminHeaders(token)
-      },
-      body: JSON.stringify(product)
-    })
-  );
+export function fetchCurrentUser(sessionToken: string): Promise<User> {
+	return apiRequest<User>('/auth/me', { sessionToken });
 }
 
-export async function deleteProduct(id: number, token: string) {
-  const response = await fetch(`/api/products/${id}`, {
-    method: 'DELETE',
-    headers: adminHeaders(token)
-  });
+// --- Protected API ---
 
-  if (!response.ok) {
-    throw new Error('Produsul nu a putut fi șters.');
-  }
+export function getOrders(sessionToken: string) {
+	return apiRequest<Order[]>('/orders', { sessionToken });
+}
+
+export function uploadImage(file: File, sessionToken: string) {
+	const formData = new FormData();
+	formData.append('fisier', file);
+	return apiRequest<{ filename: string }>('/upload', {
+		method: 'POST',
+		sessionToken,
+		body: formData
+	});
+}
+
+export function createProduct(product: ProductFormData, sessionToken: string) {
+	return apiRequest<Product>('/products', {
+		method: 'POST',
+		sessionToken,
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(product)
+	});
+}
+
+export function updateProduct(id: number, product: ProductFormData, sessionToken: string) {
+	return apiRequest<Product>(`/products/${id}`, {
+		method: 'PUT',
+		sessionToken,
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(product)
+	});
+}
+
+export function deleteProduct(id: number, sessionToken: string) {
+	return apiRequest(`/products/${id}`, {
+		method: 'DELETE',
+		sessionToken
+	});
+}
+
+export function fetchStaffUsers(sessionToken: string): Promise<User[]> {
+	return apiRequest<User[]>('/users', { sessionToken });
+}
+
+export function createStaffUser(sessionToken: string, payload: StaffUserCreatePayload): Promise<User> {
+	return apiRequest<User>('/users', {
+		method: 'POST',
+		sessionToken,
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify(payload)
+	});
 }
