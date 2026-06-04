@@ -29,6 +29,19 @@ npm install
 npm run dev
 ```
 
-## Admin
+## Conturi de test
+
+### Admin
 - **Utilizator:** `admin`
-- **Parolă:** `webtania2026`
+- **Parola:** `webtania2026`
+- **Dashboard:** `/admin`
+
+### Manager
+- **Utilizator:** `manager`
+- **Parola:** `manager2026`
+- **Dashboard:** `/manager`
+
+### Client
+- **Utilizator:** `client`
+- **Parola:** `client2026`
+- **Dashboard:** `/client`
