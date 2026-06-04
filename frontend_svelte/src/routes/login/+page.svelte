@@ -11,7 +11,7 @@
 	onMount(() => {
 		authState.hydrate();
 		if (authState.token) {
-			goto('/admin');
+			goto(authState.dashboardHref);
 		}
 	});
 
@@ -22,7 +22,7 @@
 
 		try {
 			await authState.login({ username, password });
-			await goto('/admin');
+			await goto(authState.dashboardHref);
 		} catch (error: any) {
 			errorMessage = error.message || 'Eroare la autentificare.';
 		} finally {

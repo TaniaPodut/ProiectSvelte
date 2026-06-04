@@ -9,6 +9,7 @@
   export let onReload: () => void | Promise<void> = () => {};
   export let onEdit: (product: Product) => void = () => {};
   export let onDelete: (product: Product) => void | Promise<void> = () => {};
+  export let showActions = true;
 </script>
 
 <section class="sectiune-card">
@@ -32,7 +33,9 @@
             <th>{uiText.admin.tableHeaders.category}</th>
             <th>{uiText.admin.tableHeaders.price}</th>
             <th>{uiText.admin.tableHeaders.featured}</th>
-            <th>{uiText.admin.tableHeaders.actions}</th>
+            {#if showActions}
+              <th>{uiText.admin.tableHeaders.actions}</th>
+            {/if}
           </tr>
         </thead>
         <tbody>
@@ -48,14 +51,16 @@
                   {product.isFeatured ? uiText.common.yes : uiText.common.no}
                 </span>
               </td>
-              <td>
-                <button class="btn-edit" type="button" onclick={() => onEdit(product)}>
-                  {uiText.admin.rowActions.edit}
-                </button>
-                <button class="btn-sterge" type="button" onclick={() => onDelete(product)}>
-                  {uiText.admin.rowActions.delete}
-                </button>
-              </td>
+              {#if showActions}
+                <td>
+                  <button class="btn-edit" type="button" onclick={() => onEdit(product)}>
+                    {uiText.admin.rowActions.edit}
+                  </button>
+                  <button class="btn-sterge" type="button" onclick={() => onDelete(product)}>
+                    {uiText.admin.rowActions.delete}
+                  </button>
+                </td>
+              {/if}
             </tr>
           {/each}
         </tbody>

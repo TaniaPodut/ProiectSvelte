@@ -49,7 +49,7 @@ export async function createOrder(payload: OrderPayload) {
 }
 
 export async function loginAdmin(credentials: { username: string; password: string }) {
-  return parseJson<{ token: string }>(
+  return parseJson<{ token: string; role: 'admin' | 'manager' | 'client'; display_name: string }>(
     await fetch('/api/admin/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -117,4 +117,30 @@ export async function deleteProduct(id: number, token: string) {
   if (!response.ok) {
     throw new Error('Produsul nu a putut fi șters.');
   }
+}
+
+export async function uploadImage(file: File, token: string) {
+  const formData = new FormData();
+  formData.append('fisier', file);
+
+  const response = await fetch('/api/upload', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`
+    },
+    body: formData
+  });
+
+  if (!response.ok) {
+    let message = 'Eroare la încărcarea imaginii.';
+    try {
+      const error = await response.json();
+      message = error.detail || error.message || message;
+    } catch {
+      // Ignore
+    }
+    throw new Error(message);
+  }
+
+  return response.json() as Promise<{ filename: string }>;
 }

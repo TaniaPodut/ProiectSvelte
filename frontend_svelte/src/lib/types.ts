@@ -50,7 +50,7 @@ export type AdminCredentials = {
   password: string;
 };
 
-export type UserRole = 'admin' | 'manager';
+export type UserRole = 'admin' | 'manager' | 'client';
 
 export type User = {
 	id: number;

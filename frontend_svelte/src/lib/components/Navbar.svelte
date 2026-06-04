@@ -28,11 +28,11 @@
 
     {#if authState.token}
       <a
-        href="/admin"
+        href={authState.dashboardHref}
         class="nav-link nav-link-admin"
-        class:activ={isActive('/admin', 'prefix')}
+        class:activ={isActive(authState.dashboardHref, 'prefix')}
       >
-        Panou Admin
+        Dashboard
       </a>
 
       <button type="button" class="nav-btn-logout" onclick={() => authState.logout()}>

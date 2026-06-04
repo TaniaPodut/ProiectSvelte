@@ -27,21 +27,25 @@
   let loadingProducts = $state(false);
   let loadingOrders = $state(false);
   let loadingMessages = $state(false);
-  let newProduct: ProductFormData = { ...emptyProduct };
+  let newProduct = $state<ProductFormData>({ ...emptyProduct });
   let addMessage = $state('');
   let addStatus = $state('');
   let editProduct = $state<Product | null>(null);
   let editMessage = $state('');
   let editStatus = $state('');
 
-  $: categories = [
+  let categories = $derived([
     ...new Set([...defaultProductCategories, ...products.map((product) => product.category).filter(Boolean)])
-  ];
+  ]);
 
   onMount(async () => {
     authState.hydrate();
     if (!authState.token) {
       await goto('/login');
+      return;
+    }
+    if (authState.role && authState.role !== 'admin') {
+      await goto(authState.dashboardHref);
       return;
     }
     isReady = true;
@@ -160,7 +164,11 @@
 
 {#if isReady}
   <div class="panou-admin">
-    <AdminHeader onLogout={handleLogout} />
+    <AdminHeader
+      title="Dashboard Admin"
+      subtitle={authState.displayName ? `Conectat ca ${authState.displayName}` : 'Acces complet'}
+      onLogout={handleLogout}
+    />
 
     <main class="admin-main">
       <ProductForm

@@ -64,6 +64,13 @@
 
 .admin-titlu { font-size: 20px; font-weight: 700; }
 
+.admin-subtitlu {
+  display: block;
+  margin-top: 4px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.78);
+}
+
 .admin-actiuni {
   display: flex;
   gap: 12px;

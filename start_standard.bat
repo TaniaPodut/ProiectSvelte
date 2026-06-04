@@ -1,11 +1,13 @@
 @echo off
-echo Pornesc terminalele pentru Webtania (Standard)...
+echo Pornesc Webtania (Standard)...
 
-:: Porneste Backend
+:: Porneste Backend (care serveste si frontend-ul)
 start "Webtania Backend" "C:\Program Files\Git\git-bash.exe" -c "./.venv/Scripts/python.exe -m uvicorn backend.main:app --reload; exec bash"
 
-:: Porneste Frontend
-start "Webtania Frontend" "C:\Program Files\Git\git-bash.exe" -c "./.venv/Scripts/python.exe -m http.server 5500 --directory frontend; exec bash"
-
-echo Terminalele au fost deschise!
+echo.
+echo ========================================================
+echo Serverul se porneste! 
+echo Deschide in browser: http://127.0.0.1:8000/
+echo ========================================================
+echo.
 timeout /t 3
