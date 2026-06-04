@@ -2,35 +2,99 @@ from __future__ import annotations
 
 import json
 import secrets
-import shutil
-import uuid
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile, status
+from fastapi import Depends, FastAPI, HTTPException, Query, status, Response
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.staticfiles import StaticFiles
+from pydantic import EmailStr
 from sqlalchemy import func
-from sqlmodel import Session, SQLModel, select
+from sqlmodel import Field, SQLModel, Session, select
 
-from . import auth, database
-from .models import (
-    Comanda,
-    ComandaCreare,
-    LoginRequest,
-    MesajContact,
-    Produs,
-    ProdusBase,
-    SessionResponse,
-    User,
-    UserRole,
-)
+import backend.database as database
 
+# Directorul backend/ și calea către fișierul JSON cu produse
 DIR_BAZA = Path(__file__).resolve().parent
 FISIER_PRODUSE = DIR_BAZA / "products.json"
 
+
+# --- Admin Authentication ---
+
+ADMIN_USERNAME = "admin"
+ADMIN_PASSWORD = "webtania2026"
+
+# Token-uri active în memorie (se resetează la repornirea serverului)
+tokene_valide: set[str] = set()
+security = HTTPBearer()
+
+
+def verifica_admin(
+    credentiale: HTTPAuthorizationCredentials = Depends(security),
+) -> None:
+    # Verifică dacă token-ul din header-ul Authorization: Bearer <token> este valid
+    if credentiale.credentials not in tokene_valide:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token invalid sau expirat. Autentifică-te din nou.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+# --- Data Models ---
+
+class ProdusBaza(SQLModel):
+    name: str
+    category: str
+    price: float
+    description: str
+    image: str
+    alt: str
+    isFeatured: bool = False
+
+
+class Produs(ProdusBaza, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+
+
+class ComandaBaza(SQLModel):
+    contact_name: str = Field(min_length=1, max_length=100)
+    contact_email: EmailStr
+    contact_phone: str = Field(min_length=6, max_length=20)
+    delivery_address: str = Field(min_length=5, max_length=300)
+    produs_id: int
+    quantity: int = Field(ge=1, le=10)
+    special_requests: str | None = Field(default=None, max_length=500)
+
+
+class Comanda(ComandaBaza, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    status: str = Field(default="pending")
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class ComandaCreare(ComandaBaza):
+    pass
+
+
+class MesajContact(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    nume: str = Field(min_length=1, max_length=100)
+    telefon: str = Field(default="", max_length=20)
+    email: EmailStr
+    mesaj: str = Field(min_length=1, max_length=1000)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
+
+
+class DateAutentificare(SQLModel):
+    username: str
+    password: str
+
+
+# --- Helper Functions ---
 
 def citeste_fisier_json(cale: Path, valoare_implicita: Any | None = None) -> Any:
     if not cale.exists():
@@ -42,32 +106,11 @@ def citeste_fisier_json(cale: Path, valoare_implicita: Any | None = None) -> Any
 
 
 def populeaza_date_initiale(sesiune: Session) -> None:
-    # Populează produse
     if sesiune.exec(select(Produs).limit(1)).first() is None:
         produse_brute = citeste_fisier_json(FISIER_PRODUSE)
         produse = [Produs.model_validate(p) for p in produse_brute]
         sesiune.add_all(produse)
-    
-    # Populează utilizatori (Admin și Manager)
-    if auth.get_user_by_email(sesiune, auth.INITIAL_ADMIN_EMAIL) is None:
-        auth.create_user(
-            sesiune,
-            email=auth.INITIAL_ADMIN_EMAIL,
-            display_name="Administrator",
-            password=auth.INITIAL_ADMIN_PASSWORD,
-            role=UserRole.admin,
-        )
-    
-    if auth.get_user_by_email(sesiune, auth.INITIAL_MANAGER_EMAIL) is None:
-        auth.create_user(
-            sesiune,
-            email=auth.INITIAL_MANAGER_EMAIL,
-            display_name="Manager Proiect",
-            password=auth.INITIAL_MANAGER_PASSWORD,
-            role=UserRole.manager,
-        )
-    
-    sesiune.commit()
+        sesiune.commit()
 
 
 @asynccontextmanager
@@ -78,20 +121,13 @@ async def durata_de_viata(_: FastAPI):
     yield
 
 
+# --- FastAPI Application ---
+
 app = FastAPI(
     title="Webtania API",
-    description="API FastAPI pentru gestiunea catalogului de scaune, comenzi și staff.",
+    description="API FastAPI pentru gestiunea catalogului de scaune și comenzi.",
     lifespan=durata_de_viata,
 )
-
-import traceback
-import sys
-
-@app.exception_handler(Exception)
-async def debug_exception_handler(request, exc):
-    print(f"ERROR: {exc}", file=sys.stderr)
-    traceback.print_exc()
-    return HTTPException(status_code=500, detail=str(exc))
 
 app.add_middleware(
     CORSMiddleware,
@@ -101,13 +137,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# --- Public API ---
+
+# --- Endpoints ---
+
+@app.get("/api/status")
+def obtine_status(sesiune: Session = Depends(database.obtine_sesiune)) -> dict[str, Any]:
+    return {
+        "status": "ok",
+        "numar_produse": len(sesiune.exec(select(Produs)).all()),
+        "numar_comenzi": len(sesiune.exec(select(Comanda)).all()),
+    }
+
 
 @app.get("/api/products", response_model=list[Produs])
 def obtine_produse(
     category: str | None = Query(default=None),
     sesiune: Session = Depends(database.obtine_sesiune),
-):
+) -> list[Produs]:
     interogare = select(Produs).order_by(Produs.id)
     if category:
         interogare = interogare.where(func.lower(Produs.category) == category.strip().lower())
@@ -115,7 +161,7 @@ def obtine_produse(
 
 
 @app.get("/api/products/{id_produs}", response_model=Produs)
-def obtine_produs(id_produs: int, sesiune: Session = Depends(database.obtine_sesiune)):
+def obtine_produs(id_produs: int, sesiune: Session = Depends(database.obtine_sesiune)) -> Produs:
     produs = sesiune.get(Produs, id_produs)
     if not produs:
         raise HTTPException(status_code=404, detail="Produsul nu a fost găsit.")
@@ -123,9 +169,7 @@ def obtine_produs(id_produs: int, sesiune: Session = Depends(database.obtine_ses
 
 
 @app.post("/api/orders", response_model=Comanda, status_code=201)
-def creeaza_comanda(cerere: ComandaCreare, sesiune: Session = Depends(database.obtine_sesiune)):
-    if sesiune.get(Produs, cerere.produs_id) is None:
-        raise HTTPException(status_code=404, detail="Produsul nu există.")
+def creeaza_comanda(cerere: ComandaCreare, sesiune: Session = Depends(database.obtine_sesiune)) -> Comanda:
     comanda = Comanda.model_validate(cerere)
     sesiune.add(comanda)
     sesiune.commit()
@@ -140,64 +184,38 @@ def trimite_mesaj_contact(mesaj: MesajContact, sesiune: Session = Depends(databa
     return {"status": "success"}
 
 
-@app.get("/api/contact", response_model=list[MesajContact])
-def obtine_mesaje_contact(
-    current_user: Annotated[User, Depends(auth.require_manager_or_admin)],
-    sesiune: Session = Depends(database.obtine_sesiune)
-):
-    return list(sesiune.exec(select(MesajContact).order_by(MesajContact.id.desc())).all())
+# --- Admin API ---
+
+@app.post("/api/admin/login")
+def admin_login(date: DateAutentificare) -> dict[str, str]:
+    if date.username != ADMIN_USERNAME or date.password != ADMIN_PASSWORD:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Utilizator sau parolă incorectă.",
+        )
+    token = secrets.token_hex(32)
+    tokene_valide.add(token)
+    return {"token": token}
 
 
-# --- Auth API ---
-
-@app.post("/api/auth/login", response_model=SessionResponse)
-def login(request: LoginRequest, session: Session = Depends(database.obtine_sesiune)):
-    user = auth.get_user_by_email(session, request.email)
-    if user is None or not auth.verify_password(request.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail=auth.INVALID_CREDENTIALS_DETAIL)
-    
-    if not user.is_active:
-        raise HTTPException(status_code=401, detail="Contul este inactiv.")
-
-    user_session = auth.create_user_session(session, user)
-    return SessionResponse(
-        session_token=user_session.token,
-        user=auth.build_user_response(user)
-    )
+@app.post("/api/admin/logout")
+def admin_logout(credentiale: HTTPAuthorizationCredentials = Depends(security)):
+    tokene_valide.discard(credentiale.credentials)
+    return {"mesaj": "Deconectat cu succes."}
 
 
-@app.post("/api/auth/logout")
-def logout(
-    user_session: Annotated[auth.UserSession, Depends(auth.get_current_user_session)],
-    session: Session = Depends(database.obtine_sesiune)
-):
-    auth.revoke_user_session(session, user_session)
-    return {"detail": "Deconectat cu succes."}
-
-
-@app.get("/api/auth/me", response_model=auth.StaffUserRead)
-def get_me(current_user: Annotated[User, Depends(auth.get_current_user)]):
-    return auth.build_user_response(current_user)
-
-
-# --- Protected API (Manager/Admin) ---
-
-@app.get("/api/orders", response_model=list[Comanda])
-def obtine_comenzi(
-    current_user: Annotated[User, Depends(auth.require_manager_or_admin)],
-    sesiune: Session = Depends(database.obtine_sesiune)
-):
+@app.get("/api/orders", response_model=list[Comanda], dependencies=[Depends(verifica_admin)])
+def obtine_comenzi(sesiune: Session = Depends(database.obtine_sesiune)):
     return list(sesiune.exec(select(Comanda).order_by(Comanda.created_at.desc())).all())
 
 
-# --- Protected API (Admin Only) ---
+@app.get("/api/contact", response_model=list[MesajContact], dependencies=[Depends(verifica_admin)])
+def obtine_mesaje_contact(sesiune: Session = Depends(database.obtine_sesiune)):
+    return list(sesiune.exec(select(MesajContact).order_by(MesajContact.id.desc())).all())
 
-@app.post("/api/products", response_model=Produs, status_code=201)
-def creeaza_produs(
-    produs: ProdusBase,
-    current_user: Annotated[User, Depends(auth.require_admin)],
-    sesiune: Session = Depends(database.obtine_sesiune)
-):
+
+@app.post("/api/products", response_model=Produs, status_code=201, dependencies=[Depends(verifica_admin)])
+def creeaza_produs(produs: ProdusBaza, sesiune: Session = Depends(database.obtine_sesiune)):
     produs_db = Produs.model_validate(produs)
     sesiune.add(produs_db)
     sesiune.commit()
@@ -205,13 +223,8 @@ def creeaza_produs(
     return produs_db
 
 
-@app.put("/api/products/{id_produs}", response_model=Produs)
-def actualizeaza_produs(
-    id_produs: int,
-    date_noi: ProdusBase,
-    current_user: Annotated[User, Depends(auth.require_admin)],
-    sesiune: Session = Depends(database.obtine_sesiune)
-):
+@app.put("/api/products/{id_produs}", response_model=Produs, dependencies=[Depends(verifica_admin)])
+def actualizeaza_produs(id_produs: int, date_noi: ProdusBaza, sesiune: Session = Depends(database.obtine_sesiune)):
     produs = sesiune.get(Produs, id_produs)
     if not produs:
         raise HTTPException(status_code=404, detail="Produs negăsit.")
@@ -223,52 +236,17 @@ def actualizeaza_produs(
     return produs
 
 
-@app.delete("/api/products/{id_produs}", status_code=204)
-def sterge_produs(
-    id_produs: int,
-    current_user: Annotated[User, Depends(auth.require_admin)],
-    sesiune: Session = Depends(database.obtine_sesiune)
-):
+@app.delete("/api/products/{id_produs}", status_code=204, dependencies=[Depends(verifica_admin)])
+def sterge_produs(id_produs: int, sesiune: Session = Depends(database.obtine_sesiune)):
     produs = sesiune.get(Produs, id_produs)
     if not produs:
         raise HTTPException(status_code=404, detail="Produs negăsit.")
     sesiune.delete(produs)
     sesiune.commit()
+    return Response(status_code=204)
 
 
-@app.get("/api/users", response_model=list[auth.StaffUserRead])
-def get_all_users(
-    current_user: Annotated[User, Depends(auth.require_admin)],
-    session: Session = Depends(database.obtine_sesiune)
-):
-    return [auth.build_user_response(u) for u in session.exec(select(User)).all()]
-
-
-EXTENSII_PERMISE = {".jpg", ".jpeg", ".png", ".webp", ".gif"}
-DIR_FRONTEND_SVELTE = DIR_BAZA.parent / "frontend_svelte"
-DIR_FRONTEND_BUILD = DIR_FRONTEND_SVELTE / "build"
-DIR_FRONTEND_UPLOAD = DIR_FRONTEND_SVELTE / "static"
-
-@app.post("/api/upload")
-async def upload_imagine(
-    fisier: UploadFile = File(...),
-    current_user: Annotated[User, Depends(auth.require_admin)] = None
-):
-    extensie = Path(fisier.filename or "").suffix.lower()
-    if extensie not in EXTENSII_PERMISE:
-        raise HTTPException(status_code=400, detail="Tip fișier nepermis.")
-    nume_fisier = f"{uuid.uuid4().hex}{extensie}"
-    DIR_FRONTEND_UPLOAD.mkdir(parents=True, exist_ok=True)
-    cale = DIR_FRONTEND_UPLOAD / nume_fisier
-    with cale.open("wb") as buffer:
-        shutil.copyfileobj(fisier.file, buffer)
-    return {"filename": nume_fisier}
-
-
-# Servire Frontend
-if DIR_FRONTEND_BUILD.exists():
-    app.mount("/", StaticFiles(directory=DIR_FRONTEND_BUILD, html=True), name="frontend")
-else:
-    @app.get("/")
-    def root():
-        return {"mesaj": "Frontend-ul nu este construit. Rulează 'npm run build' în frontend_svelte."}
+# --- Static Files ---
+DIR_FRONTEND = DIR_BAZA.parent / "frontend"
+if (DIR_FRONTEND / "index.html").exists():
+    app.mount("/", StaticFiles(directory=DIR_FRONTEND, html=True), name="frontend")

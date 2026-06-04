@@ -1,57 +1,37 @@
 import { browser } from '$app/environment';
-import { fetchCurrentUser, loginStaff, logoutStaff } from '$lib/api';
-import type { LoginRequestPayload, User } from '$lib/types';
+import { loginAdmin, logoutAdmin } from '$lib/api';
 
-const SESSION_STORAGE_KEY = 'webtania_session_token';
+const TOKEN_KEY = 'webtania_admin_token';
 
 class AuthState {
-	sessionToken = $state<string | null>(null);
-	currentUser = $state<User | null>(null);
+	token = $state<string | null>(null);
 	isHydrated = $state(false);
-	isLoading = $state(false);
 
-	async hydrate() {
+	hydrate() {
 		if (!browser || this.isHydrated) return;
-
-		const token = localStorage.getItem(SESSION_STORAGE_KEY);
-		if (token) {
-			try {
-				this.sessionToken = token;
-				this.currentUser = await fetchCurrentUser(token);
-			} catch {
-				this.logout();
-			}
-		}
+		this.token = localStorage.getItem(TOKEN_KEY);
 		this.isHydrated = true;
 	}
 
-	async login(payload: LoginRequestPayload): Promise<User> {
-		this.isLoading = true;
-		try {
-			const response = await loginStaff(payload);
-			this.sessionToken = response.session_token;
-			this.currentUser = response.user;
-			if (browser) {
-				localStorage.setItem(SESSION_STORAGE_KEY, response.session_token);
-			}
-			return response.user;
-		} finally {
-			this.isLoading = false;
+	async login(credentials: { username: string; password: string }) {
+		const { token } = await loginAdmin(credentials);
+		this.token = token;
+		if (browser) {
+			localStorage.setItem(TOKEN_KEY, token);
 		}
 	}
 
 	async logout() {
-		if (this.sessionToken) {
+		if (this.token) {
 			try {
-				await logoutStaff(this.sessionToken);
+				await logoutAdmin(this.token);
 			} catch {
-				// Ignore logout errors
+				// Ignore
 			}
 		}
-		this.sessionToken = null;
-		this.currentUser = null;
+		this.token = null;
 		if (browser) {
-			localStorage.removeItem(SESSION_STORAGE_KEY);
+			localStorage.removeItem(TOKEN_KEY);
 		}
 	}
 }

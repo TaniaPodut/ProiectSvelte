@@ -26,41 +26,27 @@
       {/if}
     {/each}
 
-    {#if authState.currentUser}
+    {#if authState.token}
       <a
-        href="/manager"
-        class="nav-link nav-link-staff"
-        class:activ={isActive('/manager', 'prefix')}
+        href="/admin"
+        class="nav-link nav-link-admin"
+        class:activ={isActive('/admin', 'prefix')}
       >
-        Panou Manager
+        Panou Admin
       </a>
-      
-      {#if authState.currentUser.role === 'admin'}
-        <a
-          href="/admin"
-          class="nav-link nav-link-admin"
-          class:activ={isActive('/admin', 'prefix')}
-        >
-          Panou Admin
-        </a>
-      {/if}
 
       <button type="button" class="nav-btn-logout" onclick={() => authState.logout()}>
         Deconectare
       </button>
     {:else}
       <a href="/login" class="nav-link" class:activ={isActive('/login', 'exact')}>
-        Autentificare
+        Login
       </a>
     {/if}
   </nav>
 </header>
 
 <style>
-  .nav-link-staff {
-    color: #2e6e5f;
-    font-weight: bold;
-  }
   .nav-link-admin {
     color: #8a4b08;
     font-weight: bold;

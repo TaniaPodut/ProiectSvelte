@@ -11,14 +11,14 @@ FISIER_BAZA_DATE_IMPLICIT = DIR_BAZA / "webtania.db"
 
 
 def construieste_url_baza_date(fisier_baza_date: Path) -> str:
-    # Returnează URL-ul de conectare SQLite pentru fișierul dat
+    # Returnează URL-ul de conexiune SQLite pentru fișierul dat
     return f"sqlite:///{fisier_baza_date}"
 
 
 FISIER_BAZA_DATE = FISIER_BAZA_DATE_IMPLICIT
 URL_BAZA_DATE = construieste_url_baza_date(FISIER_BAZA_DATE)
 
-# Motorul este punctul central de conexiune la baza de date
+# Motorul (engine) este punctul central de conexiune la baza de date
 motor = create_engine(
     URL_BAZA_DATE,
     connect_args={"check_same_thread": False},
@@ -26,7 +26,7 @@ motor = create_engine(
 
 
 def configureaza_motorul(fisier_baza_date: Path | None = None) -> None:
-    # Reconfigurează motorul cu un alt fișier de bază de date (util la teste)
+    # Reconfigurează motorul cu un alt fișier de bază de date (util pentru teste)
     global FISIER_BAZA_DATE, URL_BAZA_DATE, motor
 
     motor.dispose()

@@ -1,5 +1,7 @@
-fastapi==0.136.1
-pydantic==2.13.4
-SQLAlchemy==2.0.49
-sqlmodel==0.0.38
-python-multipart 
+fastapi
+uvicorn
+sqlmodel
+pydantic[email]
+python-multipart
+python-jose[cryptography]
+passlib[bcrypt]

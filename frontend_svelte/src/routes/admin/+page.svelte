@@ -7,56 +7,46 @@
     getOrders,
     getProducts,
     updateProduct,
-    uploadImage
+    uploadImage,
+    getContactMessages
   } from '$lib/api';
   import { authState } from '$lib/auth.svelte';
   import AdminHeader from '$lib/components/AdminHeader.svelte';
   import EditProductModal from '$lib/components/EditProductModal.svelte';
   import ProductForm from '$lib/components/ProductForm.svelte';
   import ProductTable from '$lib/components/ProductTable.svelte';
-  import StaffManagementPanel from '$lib/components/StaffManagementPanel.svelte';
   import { defaultProductCategories } from '$lib/data/categories';
   import { emptyProduct, uiText } from '$lib/data/siteContent';
-  import type { Order, Product, ProductFormData } from '$lib/types';
+  import type { Order, Product, ProductFormData, ContactPayload } from '$lib/types';
   import './admin.css';
 
-  let isReady = false;
-  let products: Product[] = [];
-  let orders: Order[] = [];
-  let loadingProducts = false;
-  let loadingOrders = false;
+  let isReady = $state(false);
+  let products = $state<Product[]>([]);
+  let orders = $state<Order[]>([]);
+  let messages = $state<ContactPayload[]>([]);
+  let loadingProducts = $state(false);
+  let loadingOrders = $state(false);
+  let loadingMessages = $state(false);
   let newProduct: ProductFormData = { ...emptyProduct };
-  let addMessage = '';
-  let addStatus = '';
-  let editProduct: Product | null = null;
-  let editMessage = '';
-  let editStatus = '';
+  let addMessage = $state('');
+  let addStatus = $state('');
+  let editProduct = $state<Product | null>(null);
+  let editMessage = $state('');
+  let editStatus = $state('');
 
   $: categories = [
     ...new Set([...defaultProductCategories, ...products.map((product) => product.category).filter(Boolean)])
   ];
 
   onMount(async () => {
-    await authState.hydrate();
-    if (!authState.currentUser) {
+    authState.hydrate();
+    if (!authState.token) {
       await goto('/login');
       return;
     }
-    
-    // Doar adminii pot vedea această pagină completă
-    if (authState.currentUser.role !== 'admin') {
-      await goto('/manager');
-      return;
-    }
-
     isReady = true;
     loadAdminData();
   });
-
-  function errorMessage(error: unknown, fallback: string) {
-    if (error instanceof Error) return error.message;
-    return fallback;
-  }
 
   async function handleLogout() {
     await authState.logout();
@@ -75,10 +65,10 @@
   }
 
   async function loadOrders() {
-    if (!authState.sessionToken) return;
+    if (!authState.token) return;
     loadingOrders = true;
     try {
-      orders = await getOrders(authState.sessionToken);
+      orders = await getOrders(authState.token);
     } catch (error) {
       console.error(error);
     } finally {
@@ -86,72 +76,79 @@
     }
   }
 
+  async function loadMessages() {
+      if (!authState.token) return;
+      loadingMessages = true;
+      try {
+          messages = await getContactMessages(authState.token);
+      } catch (error) {
+          console.error(error);
+      } finally {
+          loadingMessages = false;
+      }
+  }
+
   async function loadAdminData() {
-    await Promise.all([loadProducts(), loadOrders()]);
+    await Promise.all([loadProducts(), loadOrders(), loadMessages()]);
   }
 
   async function resolveImage(currentImage: string, imageFile: File | null) {
-    if (!imageFile || !authState.sessionToken) {
+    if (!imageFile || !authState.token) {
       return currentImage;
     }
-
-    const { filename } = await uploadImage(imageFile, authState.sessionToken);
+    const { filename } = await uploadImage(imageFile, authState.token);
     return filename;
   }
 
   async function handleAddProduct(product: ProductFormData, imageFile: File | null) {
-    if (!authState.sessionToken) return;
+    if (!authState.token) return;
     addMessage = uiText.admin.addProcessing;
     addStatus = '';
-
     try {
       const image = await resolveImage(product.image, imageFile);
-      await createProduct({ ...product, image }, authState.sessionToken);
+      await createProduct({ ...product, image }, authState.token);
       addMessage = uiText.admin.addSuccess;
       addStatus = 'succes';
       newProduct = { ...emptyProduct };
       await loadProducts();
-    } catch (error) {
-      addMessage = errorMessage(error, uiText.admin.addError);
+    } catch (error: any) {
+      addMessage = error.message || uiText.admin.addError;
       addStatus = 'eroare';
     }
   }
 
   async function handleEditProduct(product: ProductFormData, imageFile: File | null) {
-    if (!editProduct || !authState.sessionToken) return;
-
+    if (!editProduct || !authState.token) return;
     editMessage = uiText.admin.editProcessing;
     editStatus = '';
-
     try {
       const image = await resolveImage(product.image, imageFile);
-      await updateProduct(editProduct.id, { ...product, image }, authState.sessionToken);
+      await updateProduct(editProduct.id, { ...product, image }, authState.token);
       editMessage = uiText.admin.editSuccess;
       editStatus = 'succes';
       await loadProducts();
       setTimeout(() => {
         editProduct = null;
       }, 1000);
-    } catch (error) {
-      editMessage = errorMessage(error, uiText.admin.editError);
+    } catch (error: any) {
+      editMessage = error.message || uiText.admin.editError;
       editStatus = 'eroare';
     }
   }
 
   async function handleDeleteProduct(product: Product) {
-    if (!authState.sessionToken) return;
+    if (!authState.token) return;
     if (!confirm(uiText.admin.deleteConfirm.replace('{name}', product.name))) return;
-
     try {
-      await removeProduct(product.id, authState.sessionToken);
+      await removeProduct(product.id, authState.token);
       await loadProducts();
-    } catch (error) {
-      alert(errorMessage(error, uiText.admin.deleteError));
+    } catch (error: any) {
+      alert(error.message || uiText.admin.deleteError);
     }
   }
 
-  function openEdit(product: Product) {
-    editProduct = { ...product };
+  function openEdit(p: Product) {
+    editProduct = { ...p };
     editMessage = '';
     editStatus = '';
   }
@@ -166,10 +163,6 @@
     <AdminHeader onLogout={handleLogout} />
 
     <main class="admin-main">
-      <div class="admin-top-actions" style="margin-bottom: 2rem; display: flex; gap: 1rem;">
-          <a href="/manager" class="btn-primar" style="background: #2e6e5f; text-decoration: none;">Vizualizare Manager (Comenzi)</a>
-      </div>
-
       <ProductForm
         product={newProduct}
         {categories}
@@ -194,7 +187,6 @@
           <h2 class="sectiune-titlu admin-sectiune-titlu">Comenzi recente</h2>
           <button class="btn-primar btn-reincarca" type="button" onclick={loadOrders}>Reîncarcă</button>
         </div>
-
         {#if loadingOrders}
           <p>Se încarcă comenzile...</p>
         {:else if orders.length === 0}
@@ -205,28 +197,22 @@
               <thead>
                 <tr>
                   <th>ID</th>
-                  <th>Dată</th>
                   <th>Client</th>
                   <th>Contact</th>
-                  <th>Produs</th>
+                  <th>Produs ID</th>
                   <th>Cantitate</th>
                   <th>Status</th>
                 </tr>
               </thead>
               <tbody>
-                {#each orders.slice(0, 10) as order}
+                {#each orders as order}
                   <tr>
                     <td>{order.id}</td>
-                    <td>{new Date(order.created_at).toLocaleDateString()}</td>
                     <td>{order.contact_name}</td>
                     <td>{order.contact_email}<br />{order.contact_phone}</td>
                     <td>{order.produs_id}</td>
                     <td>{order.quantity}</td>
-                    <td>
-                        <span class="badge" style="background: #d5e5e0; color: #203b35; padding: 4px 8px; border-radius: 12px; font-size: 0.8rem;">
-                            {order.status}
-                        </span>
-                    </td>
+                    <td><span class="badge">{order.status}</span></td>
                   </tr>
                 {/each}
               </tbody>
@@ -235,7 +221,26 @@
         {/if}
       </section>
 
-      <StaffManagementPanel />
+      <section class="sectiune-card">
+          <div class="admin-sectiune-antet">
+            <h2 class="sectiune-titlu admin-sectiune-titlu">Mesaje contact</h2>
+            <button class="btn-primar btn-reincarca" type="button" onclick={loadMessages}>Reîncarcă</button>
+          </div>
+          {#if loadingMessages}
+            <p>Se încarcă mesajele...</p>
+          {:else if messages.length === 0}
+            <p>Nu există mesaje noi.</p>
+          {:else}
+            <div class="messages-list" style="display: grid; gap: 1rem;">
+              {#each messages as msg}
+                <div style="padding: 1rem; border: 1px solid #eee; border-radius: 8px;">
+                  <strong>{msg.nume}</strong> ({msg.email})
+                  <p style="margin: 0.5rem 0 0;">{msg.mesaj}</p>
+                </div>
+              {/each}
+            </div>
+          {/if}
+      </section>
     </main>
   </div>
 {/if}
@@ -250,3 +255,13 @@
     onSubmit={handleEditProduct}
   />
 {/if}
+
+<style>
+    .badge {
+        background: #d5e5e0;
+        color: #203b35;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+    }
+</style>
